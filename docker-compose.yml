@@ -5,8 +5,11 @@ services:
     command: cargo run
     volumes:
       - ./src:/app/src
+      - ./migrations:/app/migrations
     ports:
       - '8080:8080'
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db/stocks
   db:
     image: 'postgres:13.4'
     environment:

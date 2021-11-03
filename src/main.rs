@@ -1,13 +1,36 @@
+extern crate time_and_sales_deliver;
+extern crate diesel;
+
+use self::models::*;
+use self::time_and_sales_deliver::*;
+use self::diesel::prelude::*;
+
 use std::{sync::mpsc, thread};
 
 use futures::executor;
 
 use actix_web::{get, middleware, web, App, Responder, HttpResponse, HttpServer};
 
-//async fn read(datetime: &str) {
-//    let sql = format!("ORDER BY abs(TIMESTAMPDIFF(second, datetime, "{}")) LIMIT 1", datetime);
-//    println!(sql)
-//}
+use self::time_and_sales_deliver::establish_connection;
+use self::time_and_sales_deliver::models::Stock;
+use self::time_and_sales_deliver::schema::stocks::dsl::*;
+
+//use self::diesel::prelude::*;
+
+#[get("/test/{code}/{datetime}")]
+async fn test(web::Path((given_code, given_datetime)): web::Path<(String, String)>) -> HttpResponse {
+    // let sql = format!("ORDER BY abs(TIMESTAMPDIFF(second, datetime, \"{}\")) LIMIT 1", datetime);
+    // println!("{}", sql);
+    //use self::time_and_sales_deliver::models::Stock;
+    //use self::models::*;
+    //use self::diesel::prelude::*;
+    let connection = establish_connection();
+    let results = stocks.filter(code.eq(given_code as time_and_sales_deliver::schema::stocks::code))
+        .limit(5)
+        .load::<Stock>(&connection)
+        .expect("Error loading stocks");
+    HttpResponse::NoContent().finish()
+}
 
 #[get("/{code}/{datetime}/index.html")]
 async fn index(web::Path((code, datetime)): web::Path<(String, String)>) -> impl Responder {
@@ -49,6 +72,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(middleware::Logger::default())
             .service(hello)
             .service(index)
+            .service(test)
             .service(stop)
     })
     .bind(&bind)?
