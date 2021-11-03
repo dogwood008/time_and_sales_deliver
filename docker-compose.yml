@@ -1,0 +1,27 @@
+version: '3.9'
+services:
+  app:
+    build: .
+    command: cargo run
+    volumes:
+      - ./src:/app/src
+    ports:
+      - '8080:8080'
+  db:
+    image: 'postgres:13.4'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - ./postgresql:/var/lib/postgresql
+    ports:
+      - '5432:5432'
+
+  db_init:
+    build:
+      context: ./db_init_src
+    command: ruby import.rb
+    working_dir: /app
+    volumes:
+      - ./db_init_src:/app
