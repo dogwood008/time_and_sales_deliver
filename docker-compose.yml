@@ -1,0 +1,28 @@
+version: '3.9'
+services:
+  app:
+    build: ./db_init_src
+    volumes:
+      - ./src:/app/src
+      - ./migrations:/app/migrations
+    ports:
+      - '8080:8080'
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@db/stocks
+  db:
+    image: 'postgres:13.4'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - ./postgresql:/var/lib/postgresql
+    ports:
+      - '5432:5432'
+
+  db_init:
+    build: ./db_init_src
+    command: ruby import.rb
+    working_dir: /app
+    volumes:
+      - ./db_init_src:/app
