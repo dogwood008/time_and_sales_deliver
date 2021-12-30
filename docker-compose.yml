@@ -1,0 +1,42 @@
+version: '3.9'
+services:
+  app:
+    build: ./db_app_src
+    volumes:
+      - ./src:/app/src
+      - ./migrations:/app/migrations
+    ports:
+      - '8080:8080'
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - PGDATA=/var/lib/postgresql/data
+      - DATABASE_URL=postgres://postgres:postgres@db/stocks
+      - POSTGRES_DB_NAME=stocks
+    volumes:
+      - ./db_app_src:/app
+  db:
+    image: 'postgres:13.4'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - ./postgresql:/var/lib/postgresql
+    ports:
+      - '5432:5432'
+
+  db_init:
+    build: ./db_init_src
+    depends_on:
+      - db
+    command: ruby import.rb
+    working_dir: /app
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB_NAME=stocks
+    volumes:
+      - ./db_init_src:/app

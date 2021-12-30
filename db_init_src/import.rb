@@ -1,10 +1,11 @@
 require 'pg'
 require './sbi'
 
-DB_HOST = ENV.fetch('DB_HOST', 'db')
-DB_PORT = ENV.fetch('DB_PORT', 5432)
-DB_USER = ENV.fetch('DB_USER', 'postgres')
-DB_PW = ENV.fetch('DB_PW', 'postgres')
+DB_HOST = ENV.fetch('POSTGRES_HOST')
+DB_PORT = ENV.fetch('POSTGRES_PORT', 5432)
+DB_USER = ENV.fetch('POSTGRES_USER')
+DB_PW = ENV.fetch('POSTGRES_PASSWORD')
+DB_NAME = ENV.fetch('POSTGRES_DB_NAME')
 
 # https://deveiate.org/code/pg/PG/Connection.html#method-c-new
 conn = PG.connect(
@@ -12,6 +13,7 @@ conn = PG.connect(
   port: DB_PORT,
   user: DB_USER,
   password: DB_PW,
+  dbname: DB_NAME,
 )
 
 stock_code = 7974
@@ -31,3 +33,5 @@ conn.copy_data("COPY stock_#{stock_code} FROM STDIN", enc) do
     conn.put_copy_data line
   end
 end
+
+puts 'Import completed.'
