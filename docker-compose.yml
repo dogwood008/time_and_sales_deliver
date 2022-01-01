@@ -3,8 +3,11 @@ services:
   app:
     build: ./db_app_src
     volumes:
-      - ./src:/app/src
-      - ./migrations:/app/migrations
+      # https://www.docker.com/blog/user-guided-caching-in-docker-for-mac/
+      # > develop software using an editor on your host, running development tools in a container
+      # https://docs.docker.jp/docker-for-mac/osxfs-caching.html#cached
+      # > ホストの表示が信頼できる（ホスト上の更新がコンテナ上に反映するまで、遅延が発生するのを許容）
+      - ./db_app_src:/app:cached
     ports:
       - '8080:8080'
     environment:
@@ -14,8 +17,6 @@ services:
       - PGDATA=/var/lib/postgresql/data
       - DATABASE_URL=postgres://postgres:postgres@db/stocks
       - POSTGRES_DB_NAME=stocks
-    volumes:
-      - ./db_app_src:/app
   db:
     image: 'postgres:13.4'
     environment:
@@ -39,4 +40,4 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB_NAME=stocks
     volumes:
-      - ./db_init_src:/app
+      - ./db_init_src:/app:delegated  # Guest -> Hostで遅延有り
