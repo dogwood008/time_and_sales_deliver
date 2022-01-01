@@ -13,7 +13,6 @@ conn = PG.connect(
   port: DB_PORT,
   user: DB_USER,
   password: DB_PW,
-  dbname: DB_NAME,
 )
 
 stock_code = 7974
@@ -21,6 +20,9 @@ date = '2021-09-09'
 file_path = "./#{stock_code}_#{date}.csv"
 
 enc = PG::TextEncoder::CopyRow.new
+
+conn.exec(%{SELECT 'CREATE DATABASE #{DB_NAME}'
+  WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '#{DB_NAME}')})
 
 conn.exec(%{CREATE TABLE IF NOT EXISTS stock_#{stock_code} (
   datetime timestamp NOT NULL,
