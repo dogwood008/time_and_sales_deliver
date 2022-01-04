@@ -8,9 +8,6 @@ class App
   DB_PW = ENV.fetch('POSTGRES_PASSWORD')
   DB_NAME = ENV.fetch('POSTGRES_DB_NAME')
 
-  STOCK_CODE = 7974
-  DATETIME = '2021-09-09 14:59:30'
-
   APP_ENV = ENV.fetch('APP_ENV', 'dev')
   def development?
     APP_ENV == 'dev'
@@ -35,14 +32,14 @@ class App
       LIMIT 1;}
   end
 
-  def exec
-    tick_sql = sql(STOCK_CODE, DATETIME)
+  def exec(stock_code, datetime)
+    tick_sql = sql(stock_code, datetime)
     @conn.exec(tick_sql) do |result|
       result.first
     end
-  ensure
+  end
+
+  def close
     @conn.finish
   end
 end
-
-puts App.new.exec.to_json
