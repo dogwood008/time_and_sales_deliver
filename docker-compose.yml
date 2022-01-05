@@ -9,7 +9,7 @@ services:
       # > ホストの表示が信頼できる（ホスト上の更新がコンテナ上に反映するまで、遅延が発生するのを許容）
       - ./db_app_src:/app:cached
     ports:
-      - '8080:8080'
+      - '4567:4567'
     environment:
       - POSTGRES_HOST=db
       - POSTGRES_USER=postgres

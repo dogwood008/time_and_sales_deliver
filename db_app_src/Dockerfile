@@ -6,4 +6,6 @@ COPY Gemfile.lock /tmp/Gemfile.lock
 RUN bundle install
 
 WORKDIR /app
-CMD ruby app.rb
+
+EXPOSE 4567
+CMD ["bundle", "exec", "ruby", "server.rb"]
