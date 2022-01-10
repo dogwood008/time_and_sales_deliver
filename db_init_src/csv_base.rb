@@ -7,12 +7,10 @@ class CsvBase
 
   # each_line前に実施することがあればオーバライドして記載する
   def preprocess(file_path)
-    pass
   end
 
   # each_line後に実施することがあればオーバライドして記載する
   def postprocess(file_path)
-    pass
   end
 
   def each_line
