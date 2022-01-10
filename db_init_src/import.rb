@@ -1,5 +1,6 @@
 require 'pg'
-require './sbi'
+# require './sbi'
+require './jpx'
 
 DB_HOST = ENV.fetch('POSTGRES_HOST')
 DB_PORT = ENV.fetch('POSTGRES_PORT', 5432)
@@ -16,8 +17,9 @@ conn = PG.connect(
 )
 
 stock_code = 7974
-date = '2021-09-09'
-file_path = "./#{stock_code}_#{date}.csv"
+#date = '2021-09-09'
+#file_path = "./#{stock_code}_#{date}.csv"
+file_path = "./stock_ticks/202111/#{stock_code}.csv"
 
 enc = PG::TextEncoder::CopyRow.new
 
@@ -31,9 +33,13 @@ conn.exec(%{CREATE TABLE IF NOT EXISTS stock_#{stock_code} (
 );})
 
 conn.copy_data("COPY stock_#{stock_code} FROM STDIN", enc) do
-  Sbi.new(file_path).each_line do |line|
+  Jpx.new(file_path).each_line do |line|
     conn.put_copy_data line
   end
+  # SBI
+  # Sbi.new(file_path).each_line do |line|
+  #   conn.put_copy_data line
+  # end
 end
 
 puts 'Import completed.'
