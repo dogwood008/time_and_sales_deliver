@@ -24,7 +24,7 @@ class App
     require 'debug' if development?
   end
 
-  def sql(stock_code, datetime)
+  def single_sql(stock_code, datetime)
     %{SELECT *
       FROM stock_#{stock_code}
       WHERE datetime <= '#{datetime}'
@@ -32,11 +32,27 @@ class App
       LIMIT 1;}
   end
 
-  def exec(stock_code, datetime)
-    tick_sql = sql(stock_code, datetime)
+  # ORDER BY datetime DESC があるので、from & toは逆に配置
+  def range_sql(stock_code, from_dt, to_dt)
+    %{SELECT *
+      FROM stock_#{stock_code}
+      WHERE datetime <= '#{to_dt}'
+      AND '#{from_dt}' <= datetime
+      ORDER BY datetime DESC;}
+  end
+
+  def single(stock_code, datetime)
+    tick_sql = single_sql(stock_code, datetime)
     @conn.exec(tick_sql) do |result|
       result.first
     end
+  end
+
+  def range(stock_code, from_dt, to_dt)
+    tick_sql = range_sql(stock_code, from_dt, to_dt)
+    @conn.exec(tick_sql) { |result|
+      result.values
+    }
   end
 
   def close
