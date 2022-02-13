@@ -13,7 +13,7 @@ get '/:code/:datetime' do
   app.single(stock_code, datetime).to_json
 end
 
-# e.g.) /7974/2021-09-09T14:59:30
+# e.g.) /7974/2021-09-09T14:59:30/2021-09-10T14:59:30
 get '/:code/:from_dt/:to_dt' do
   stock_code = params['code']
   from_dt = params['from_dt']
