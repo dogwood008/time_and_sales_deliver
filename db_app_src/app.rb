@@ -1,5 +1,6 @@
 require 'pg'
 require 'json'
+require 'time'
 
 class App
   DB_HOST = ENV.fetch('POSTGRES_HOST')
@@ -34,7 +35,7 @@ class App
 
   # ORDER BY datetime DESC があるので、from & toは逆に配置
   def range_sql(stock_code, from_dt, to_dt)
-    %{SELECT *
+    %{SELECT datetime, volume::float, price::float
       FROM stock_#{stock_code}
       WHERE datetime <= '#{to_dt}'
       AND '#{from_dt}' <= datetime
@@ -50,9 +51,10 @@ class App
 
   def range(stock_code, from_dt, to_dt)
     tick_sql = range_sql(stock_code, from_dt, to_dt)
-    @conn.exec(tick_sql) { |result|
+    resp = @conn.exec(tick_sql) { |result|
       result.values
     }
+    resp.map{|r| [Time.parse("#{r[0]}+09:00"), r[1], r[2]] }
   end
 
   def close
