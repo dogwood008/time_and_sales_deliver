@@ -6,6 +6,11 @@ set :bind, '0.0.0.0'
 
 app = App.new
 
+# https://stackoverflow.com/a/4632141/15983717
+before do
+  content_type 'application/json'
+end
+
 # e.g.) /7974/2021-09-09T14:59:30
 get '/:code/:datetime' do
   stock_code = params['code']
