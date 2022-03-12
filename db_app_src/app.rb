@@ -29,7 +29,7 @@ class App
     %{SELECT *
       FROM stock_#{stock_code}
       WHERE datetime <= '#{datetime}'
-      ORDER BY datetime DESC
+      ORDER BY datetime ASC
       LIMIT 1;}
   end
 
@@ -39,7 +39,7 @@ class App
       FROM stock_#{stock_code}
       WHERE datetime <= '#{to_dt}'
       AND '#{from_dt}' <= datetime
-      ORDER BY datetime DESC;}
+      ORDER BY datetime ASC;}
   end
 
   def single(stock_code, datetime)
